@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 public class Visual extends Canvas {
 	private int x1, x2, y, qx, qy1, qy2;
@@ -43,7 +44,8 @@ public class Visual extends Canvas {
 						Collections.sort(points, new Xcomp());
 						IntervalTree InterTree = new IntervalTree(L, points);
 						answer.clear();
-						InterTree.queryIntervalTree(qx, Math.min(qy1, qy2), Math.max(qy1, qy2), answer);
+						InterTree.queryIntervalTree(qx, Math.min(qy1, qy2),
+								Math.max(qy1, qy2), answer);
 						repaint();
 
 					}
@@ -87,17 +89,46 @@ public class Visual extends Canvas {
 	}
 
 	public static void main(String s[]) {
-		final Frame f = new Frame("Draw");
-		f.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				f.dispose();
+		if ((s.length == 3) && (s[0].equals("--test"))) {
+			int n = Integer.valueOf(s[1]);
+			int m = Integer.valueOf(s[2]);
+			Visual vis = new Visual();
+			Random rand = new Random();
+			int x1, x2, y;
+			for (int i = 0; i < n; i++) {
+				x1 = rand.nextInt();
+				x2 = rand.nextInt();
+				y = rand.nextInt();
+				HorizontalInterval interval = new HorizontalInterval(Math.min(
+						x1, x2), Math.max(x1, x2), y);
+				vis.L.add(interval);
+				vis.points.add(new Point(x1, y, interval));
+				vis.points.add(new Point(x2, y, interval));
 			}
-		});
-		f.setSize(400, 300);
+			Collections.sort(vis.points, new Xcomp());
+			IntervalTree InterTree = new IntervalTree(vis.L, vis.points);
+			int qx, qy1, qy2;
+			for (int i = 0; i < m; i++) {
+				vis.answer.clear();
+				qx = rand.nextInt();
+				qy1 = rand.nextInt();
+				qy2 = rand.nextInt();
+				InterTree.queryIntervalTree(qx, Math.min(qy1, qy2),
+						Math.max(qy1, qy2), vis.answer);
+			}
+		} else {
+			final Frame f = new Frame("Draw");
+			f.addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+					f.dispose();
+				}
+			});
+			f.setSize(400, 300);
 
-		final Canvas c = new Visual();
-		f.add(c);
+			final Canvas c = new Visual();
+			f.add(c);
 
-		f.setVisible(true);
+			f.setVisible(true);
+		}
 	}
 }
